@@ -1,0 +1,21 @@
+body, html {
+    font-size: 13px;
+}
+
+header, footer {
+    display: block;
+    height: 50px;
+    border-bottom: 2px solid black;
+    text-align: center;
+    line-height: 50px;
+    background-color: #b0b0b0;
+}
+
+footer {
+    border-top: 2px solid black;
+    border-bottom:none;
+}
+
+#container {
+
+}
