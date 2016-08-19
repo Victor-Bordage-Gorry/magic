@@ -1,6 +1,6 @@
 <?php
 
-class Curl_helper {
+class Curl {
 
     // vars
     public  $url;
@@ -53,11 +53,11 @@ class Curl_helper {
         // initialisation du Curl et de l'url
         $curl = curl_init();
         $url = $this->url . $this->function;
-
+        $xml = 0;
         switch ($this->method){
             case 'GET': // for regular use
             if ($this->data)
-                $this->url = sprintf('%s?%s', $url, http_build_query($this->data));
+                $url = sprintf('%s?%s', $url, http_build_query($this->data));
             break;
 
             case 'POST':
@@ -68,8 +68,10 @@ class Curl_helper {
 
             case 'PUT':
             curl_setopt($curl, CURLOPT_CUSTOMREQUEST, 'PUT');
-            if ($this->data)
-                curl_setopt($curl, CURLOPT_POSTFIELDS, http_build_query($this->data));
+            if ($this->data) {
+                curl_setopt($curl, CURLOPT_POSTFIELDS, $this->data);
+                $xml = 1;
+            }
             break;
 
             case 'DELETE':
@@ -85,7 +87,11 @@ class Curl_helper {
 
         $header = $this->prepare_header($url);
 
-        curl_setopt($curl, CURLOPT_HTTPHEADER, array($header));
+        $table_header = array($header);
+        if ($xml) {
+            $table_header[] = 'Content-Type: text/xml';
+        }
+        curl_setopt($curl, CURLOPT_HTTPHEADER, $table_header);
 
         $result = curl_exec($curl);
         $http_code = curl_getinfo($curl, CURLINFO_HTTP_CODE);
@@ -118,7 +124,7 @@ class Curl_helper {
         $baseString .= $paramsString;
 
         // construction de la signature OAuth
-        $signatureKey = rawurlencode(APP_SECRET) . "&" . rawurlencode(ACCESS_TOKEN_SECRET);
+        $signatureKey = rawurlencode(MKM_APP_SECRET) . "&" . rawurlencode(MKM_ACCESS_TOKEN_SECRET);
         $rawSignature = hash_hmac("sha1", $baseString, $signatureKey, true);
         $oAuthSignature = base64_encode($rawSignature);
 

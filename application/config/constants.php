@@ -94,3 +94,16 @@ define('IMG_PATH', APP_PATH . 'assets/img/');
 define('CSS_PATH', APP_PATH . 'assets/css/');
 define('JS_PATH', APP_PATH . 'assets/js/');
 
+
+
+/**
+ * MKM
+ */
+
+define('MKM_APP_NAME', 'cards_manager');
+define('MKM_APP_TYPE', 'Dedicated');
+define('MKM_APP_TOKEN', 'vpunI7RCCUbwwi92');
+define('MKM_APP_SECRET', 'se9oQNeZh9ocDpXhInyRcMsja2KJqtYv');
+define('MKM_ACCESS_TOKEN', 'owiJMEBxJAPLYDjGmOLRwDTj0BOIeXbi');
+define('MKM_ACCESS_TOKEN_SECRET', '7jQt8WAx2UCl8AiUEr1kxA8Fh0cXQIGe');
+define('MIN_PRICE_CARD', 0.07);

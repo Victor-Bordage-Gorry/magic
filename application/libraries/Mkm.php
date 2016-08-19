@@ -1,6 +1,6 @@
 <?php
-
-class MKM_helper {
+require_once 'Curl.php';
+class Mkm {
 
     private $url;
     private $default_params = array();
@@ -17,10 +17,10 @@ class MKM_helper {
      *
      */
     public function __construct() {
-        $this->url = 'https://sandbox.mkmapi.eu/ws/v1.1/output.json/';
+        $this->url = 'https://sandbox.mkmapi.eu/ws/v2.0/output.json/';
         $this->default_params = array(
-           'oauth_consumer_key'        => APP_TOKEN,
-           'oauth_token'               => ACCESS_TOKEN,
+           'oauth_consumer_key'        => MKM_APP_TOKEN,
+           'oauth_token'               => MKM_ACCESS_TOKEN,
            'oauth_signature_method'    => 'HMAC-SHA1',
            'oauth_version'             => '1.0'
         );
@@ -39,7 +39,7 @@ class MKM_helper {
      * Fonction d'initialisation du client Curl
      */
     private function init_curl() {
-        $this->client = new CURL_Client($this->url, $this->default_params);
+        $this->client = new Curl($this->url, $this->default_params);
     }
 
     /**
@@ -51,24 +51,43 @@ class MKM_helper {
      */
     protected function get_stock($options = array(), $decode = true) {
         list($http_code, $result) = $this->client->get('stock');
-
         if($http_code != self::HTTP_CODE_LIST) {
             throw new Exception('Error : can\'t get user\'s stock.', $http_code);
         }
 
-        return $decode ? json_decode($result) : $result;
+        return $decode ? json_decode($result,true) : $result;
     }
 
     protected function get_product($id_product, $options = array(), $decode = true) {
-        if (empty($id_product) && !is_numeric($id_product))
+        if (empty($id_product) && !is_numeric($id_product)) {
             return false;
-
-        list($http_code, $result) = $this->client->get('product/' . $id_product);
+        }
+        list($http_code, $result) = $this->client->get('products/' . $id_product);
 
         if($http_code != self::HTTP_CODE_INFO) {
             throw new Exception('Error : can\'t get product\'s data.', $http_code);
         }
 
-        return $decode ? json_decode($result) : $result;
+        return $decode ? json_decode($result, true) : $result;
     }
+
+    // mise à jour des informations d'un article
+    protected function put_article($data) {
+        list($http_code, $result) = $this->client->put('stock', $this->data_to_xml($data));
+        if($http_code != self::HTTP_CODE_LIST) {
+            throw new Exception('Error : can\'t update article\'s data (id : ' . $data['idProduct'] .')', $http_code);
+        }
+
+        return true;
+    }
+
+    private function data_to_xml($data) {
+        $xml = '<request><article>';
+        foreach ($data as $k => $v) {
+            $xml .= '<' . $k . '>' . $v . '</' . $k . '>';
+        }
+        $xml .= '</article></request>';
+        return $xml;
+    }
+
 }
